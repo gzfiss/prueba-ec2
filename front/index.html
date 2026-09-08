@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Monolito AWS</title>
+</head>
+
+<body>
+
+    <h1>Mini aplicación en AWS 🚀</h1>
+
+    <input
+        type="text"
+        id="nombre"
+        placeholder="Escribe tu nombre"
+    >
+
+    <button onclick="saludar()">
+        Enviar al backend
+    </button>
+
+    <p id="respuesta"></p>
+
+    <script>
+        async function saludar() {
+
+            const nombre =
+                document.getElementById("nombre").value;
+
+            const respuesta =
+                await fetch(
+                    `http://${window.location.hostname}:8000/saludo?nombre=${nombre}`
+                );
+
+            const datos =
+                await respuesta.json();
+
+            document.getElementById("respuesta").innerText =
+                datos.mensaje;
+        }
+    </script>
+
+</body>
+</html>
