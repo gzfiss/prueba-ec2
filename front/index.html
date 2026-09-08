@@ -2,42 +2,234 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mini Monolito AWS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini App AWS</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(
+                135deg,
+                #fde2e4,
+                #e2ece9,
+                #bee1e6,
+                #f0efeb
+            );
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: aparecer 0.7s ease;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #5c5470;
+        }
+
+        .subtitulo {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #d8e2dc;
+            border-radius: 14px;
+            outline: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #b8c0ff;
+            transform: scale(1.02);
+        }
+
+        button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 14px;
+            background: #cdb4db;
+            color: #4a4058;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            background: #ffc8dd;
+        }
+
+        .respuesta {
+            min-height: 60px;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 14px;
+            background: #f8f9fa;
+            color: #5c5470;
+            display: none;
+            animation: aparecer 0.4s ease;
+        }
+
+        .respuesta.activa {
+            display: block;
+        }
+
+        .estado {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .punto {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            background: #8ac926;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .input-container {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>Mini aplicación en AWS 🚀</h1>
+    <div class="card">
 
-    <input
-        type="text"
-        id="nombre"
-        placeholder="Escribe tu nombre"
-    >
+        <h1>Mini App AWS 🚀</h1>
 
-    <button onclick="saludar()">
-        Enviar al backend
-    </button>
+        <p class="subtitulo">
+            Frontend + FastAPI + EC2
+        </p>
 
-    <p id="respuesta"></p>
+        <div class="input-container">
+
+            <input
+                type="text"
+                id="nombre"
+                placeholder="Escribe tu nombre..."
+            >
+
+            <button onclick="saludar()">
+                Enviar
+            </button>
+
+        </div>
+
+        <div id="respuesta" class="respuesta"></div>
+
+        <div class="estado">
+            <span class="punto"></span>
+            Backend conectado a EC2
+        </div>
+
+    </div>
 
     <script>
+
         async function saludar() {
 
             const nombre =
                 document.getElementById("nombre").value;
 
-            const respuesta =
-                await fetch(
-                    `http://${window.location.hostname}:8000/saludo?nombre=${nombre}`
-                );
+            const respuestaDiv =
+                document.getElementById("respuesta");
 
-            const datos =
-                await respuesta.json();
+            if (!nombre.trim()) {
 
-            document.getElementById("respuesta").innerText =
-                datos.mensaje;
+                respuestaDiv.innerText =
+                    "Escribe un nombre primero 👀";
+
+                respuestaDiv.classList.add("activa");
+
+                return;
+            }
+
+            respuestaDiv.innerText =
+                "Consultando backend... ⏳";
+
+            respuestaDiv.classList.add("activa");
+
+            try {
+
+                const respuesta =
+                    await fetch(
+                        `http://${window.location.hostname}:8000/saludo?nombre=${nombre}`
+                    );
+
+                const datos =
+                    await respuesta.json();
+
+                respuestaDiv.innerText =
+                    datos.mensaje;
+
+            } catch (error) {
+
+                respuestaDiv.innerText =
+                    "No se pudo conectar con el backend 😭";
+
+            }
         }
+
+        document
+            .getElementById("nombre")
+            .addEventListener("keydown", function(event) {
+
+                if (event.key === "Enter") {
+                    saludar();
+                }
+
+            });
+
     </script>
 
 </body>
